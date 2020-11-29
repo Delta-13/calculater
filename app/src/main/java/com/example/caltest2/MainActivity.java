@@ -3,7 +3,7 @@ package com.example.caltest2;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;Delta-13
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -104,7 +104,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         String str = text.getText().toString();
-        boolean b = str.charAt(str.length() - 1) == '+' || str.charAt(str.length() - 1) == '-' || str.charAt(str.length() - 1) == '×' || str.charAt(str.length() - 1) == '÷' || str.charAt(str.length() - 1) == '.';
+        boolean b = str.charAt(str.length() - 1) == '+' || str.charAt(str.length() - 1) == '-' ||
+                str.charAt(str.length() - 1) == '×' || str.charAt(str.length() - 1) == '÷' ||
+                str.charAt(str.length() - 1) == '.' || str.charAt(str.length() - 1) == '(';
+        boolean y = str.contains("()") || str.contains("÷×") || str.contains("×÷") || str.contains("×+") ||
+                str.contains("+×") || str.contains("+÷") || str.contains("÷+") || str.contains("+-") || str.contains("-+");
+        boolean b1 = str.contains("+") || str.contains("-") || str.contains("×") || str.contains("÷");
         switch(v.getId()){
             case R.id.btn_del:
                 if(str.length()>1){
@@ -210,37 +215,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 text.setText(str);
                 break;
             case R.id.btn_p:
-                Toast.makeText(MainActivity.this, str.length(), Toast.LENGTH_LONG).show();
-                if(b) {
+//                Toast.makeText(MainActivity.this, str.length(), Toast.LENGTH_LONG).show();
+                if(b || str.charAt(str.length() - 1) == ')') {
                     Toast.makeText(MainActivity.this, "Input error!0", Toast.LENGTH_SHORT).show();
-                    text.setText(str);
                 }
-                else if(str.charAt(str.length() - 1)  >= 48 && 57 >= str.charAt(str.length()-1)){
-                    int sign = 0, sign1 = 0;
-                    int i;
-                    for(i = str.length(); i > 0; i--){
-                        char c = str.charAt(i);
-                        if(c != '+' && c != '-' && c != '×' && c != '÷')
-                            sign1 = 1;
-                        if(sign1 == 1 && str.contains(".")){
-                            sign = 1;
-                        }
-                        break;
-                    }
-                    if (sign == 1){
-                        Toast.makeText(MainActivity.this, "Input error!01234", Toast.LENGTH_SHORT).show();
-                        text.setText(str);
-                    }
-                }
+//                else if(str.charAt(str.length() - 1)  >= 48 && 57 >= str.charAt(str.length()-1)){
+//                    int sign = 0, sign1 = 0;
+//                    int i;
+//                    for(i = str.length(); i > 0; i--){
+//                        char c = str.charAt(i);
+//                        if(c != '+' && c != '-' && c != '×' && c != '÷')
+//                            sign1 = 1;
+//                        if(sign1 == 1 && str.contains(".")){
+//                            sign = 1;
+//                        }
+//                        break;
+//                    }
+//                    if (sign == 1){
+//                        Toast.makeText(MainActivity.this, "Input error!01234", Toast.LENGTH_SHORT).show();
+//                        text.setText(str);
+//                    }
+//                }
                 else {
                     str += ".";
-                    text.setText(str);
                 }
+                text.setText(str);
                 break;
             case R.id.btn_add:
                 if(b){
                     str = str.substring(0,str.length() - 1);
                 }
+
                 str += "+";
                 text.setText(str);
                 break;
@@ -261,17 +266,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn_div:
                 if(b){
                     str = str.substring(0,str.length() - 1);
-                    str += "÷";
-                    text.setText(str);
                 }
-                else if(str.charAt(str.length()-1) == '0'){
-                    Toast.makeText(MainActivity.this,"Input error!0chu",Toast.LENGTH_SHORT).show();
-                    text.setText(str);
-                }
-                else {
-                    str += "÷";
-                    text.setText(str);
-                }
+                str += "÷";
+                text.setText(str);
                 break;
             case R.id.btn_leftbra:
                 if (str.length()==1){
@@ -295,7 +292,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 text.setText(str);
                 break;
             case R.id.btn_equ:
-                if(str.charAt(str.length()-1)=='+'||str.charAt(str.length()-1)=='-'||str.charAt(str.length()-1)=='×'||str.charAt(str.length()-1)=='÷'){
+                if(b){
+                    Toast.makeText(MainActivity.this,"Please complete the formula!",Toast.LENGTH_SHORT).show();
+                    text.setText(str);
+                }
+                else if(y){
                     Toast.makeText(MainActivity.this,"Please complete the formula!",Toast.LENGTH_SHORT).show();
                     text.setText(str);
                 }
@@ -319,10 +320,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Toast.makeText(MainActivity.this,"Negative numbers cannot be squared!",Toast.LENGTH_SHORT).show();
                     text.setText("0");
                 }
-                else if(str.contains("+")||str.contains("-")||str.contains("×")||str.contains("÷")){
+                else if(b1){
                     Toast.makeText(MainActivity.this,"Symbols cannot be squared!",Toast.LENGTH_SHORT).show();
                     text.setText("0");
                 }
+                else if(str.charAt(0) == '+' || str.charAt(0) == '-' || str.charAt(0) == '×' || str.charAt(0) == '÷'){
+                    Toast.makeText(MainActivity.this,"Symbols cannot be squared!",Toast.LENGTH_SHORT).show();
+                    text.setText("0");
+            }
                 else{
                     double x=Double.parseDouble(str);
                     x=Math.sqrt(x);
@@ -333,12 +338,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 break;
             case R.id.btn_percent:
-                double per=Double.parseDouble(str);
-                per=per/100;
-                String per1=""+per;
-                per1 = per1.replaceAll("0+?$", "");//去掉多余的0
-                per1 = per1.replaceAll("[.]$", "");//如最后一位是.则去掉
-                text.setText(per1);
+                if (b1 || str.contains("(") || str.contains(")")){
+                    Toast.makeText(MainActivity.this,"Input error!",Toast.LENGTH_SHORT).show();
+                    text.setText("0");
+                } else {
+                    double per=Double.parseDouble(str);
+                    per=per/100;
+                    String per1=""+per;
+                    per1 = per1.replaceAll("0+?$", "");//去掉多余的0
+                    per1 = per1.replaceAll("[.]$", "");//如最后一位是.则去掉
+                    text.setText(per1);
+                }
                 break;
             case R.id.btn_sin:
                 double sinn=Double.parseDouble(str);
@@ -381,6 +391,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static StringBuffer toPostfix(String infix){
         Stack<String> stack=new Stack<String>();   //运算符栈,顺序栈
         StringBuffer postfix=new StringBuffer(infix.length()*2);   //后缀表达式字符串
+        if('-' == infix.charAt(0)){
+            infix = 0 + infix;
+        }
         int i=0;
         while(i<infix.length()){
             char ch=infix.charAt(i);
